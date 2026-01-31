@@ -1,26 +1,124 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-serif);
+  /* Add Serif font */
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.5rem;
+
+  /* Luxury Light Theme - Purple Tinted */
+  --background: oklch(0.97 0.01 290);
+  /* Subtle Lavender Mist */
+  --foreground: oklch(0.2 0.04 290);
+  /* Deep Plum */
+
+  --card: oklch(0.98 0.005 290);
+  --card-foreground: oklch(0.2 0.04 290);
+
+  --popover: oklch(0.98 0.005 290);
+  --popover-foreground: oklch(0.2 0.04 290);
+
+  /* Rich Royal Purple */
+  --primary: oklch(0.5 0.22 290);
+  --primary-foreground: oklch(0.98 0 0);
+
+  /* Gold / Champagne */
+  --secondary: oklch(0.93 0.03 290);
+  --secondary-foreground: oklch(0.4 0.1 290);
+
+  --muted: oklch(0.94 0.02 290);
+  --muted-foreground: oklch(0.5 0.04 290);
+
+  --accent: oklch(0.92 0.03 290);
+  --accent-foreground: oklch(0.4 0.1 290);
+
+  --destructive: oklch(0.6 0.15 25);
+  --destructive-foreground: oklch(0.98 0 0);
+
+  --border: oklch(0.9 0.02 290);
+  --input: oklch(0.9 0.02 290);
+  --ring: oklch(0.5 0.22 290);
+}
+
+.dark {
+  /* Luxury Dark Theme - Deep Purple/Black */
+  --background: oklch(0.15 0.02 280);
+  --foreground: oklch(0.95 0.01 260);
+
+  --card: oklch(0.2 0.03 280);
+  --card-foreground: oklch(0.95 0.01 260);
+
+  --popover: oklch(0.2 0.03 280);
+  --popover-foreground: oklch(0.95 0.01 260);
+
+  --primary: oklch(0.7 0.15 280);
+  /* Lighter violet for dark mode */
+  --primary-foreground: oklch(0.15 0.02 280);
+
+  --secondary: oklch(0.3 0.05 85);
+  --secondary-foreground: oklch(0.9 0.05 85);
+
+  --muted: oklch(0.25 0.02 280);
+  --muted-foreground: oklch(0.7 0.02 260);
+
+  --accent: oklch(0.25 0.03 280);
+  --accent-foreground: oklch(0.95 0.01 260);
+
+  --destructive: oklch(0.6 0.15 25);
+  --destructive-foreground: oklch(0.98 0 0);
+
+  --border: oklch(0.3 0.02 280);
+  --input: oklch(0.3 0.02 280);
+  --ring: oklch(0.7 0.15 280);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif tracking-tight;
+  }
 }
