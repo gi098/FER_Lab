@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       try {
         const fileData = fs.readFileSync(dbPath, "utf-8");
         users = JSON.parse(fileData);
-      } catch (_err) {
+      } catch {
         // file might not exist yet
       }
 
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       { error: "Invalid credentials" },
       { status: 401 }
     );
-  } catch (_error) {
+  } catch {
     return NextResponse.json(
       { error: "Something went wrong" },
       { status: 500 }

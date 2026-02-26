@@ -34,7 +34,7 @@ export async function POST(request: Request) {
                 const fileData = fs.readFileSync(dbPath, "utf-8");
                 users = JSON.parse(fileData);
             }
-        } catch (_err) {
+        } catch {
             // ignore
         }
 
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
             { status: 201 }
         );
 
-    } catch (_error) {
+    } catch {
         return NextResponse.json(
             { error: "Something went wrong" },
             { status: 500 }
