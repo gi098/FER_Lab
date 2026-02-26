@@ -9,6 +9,9 @@ import { Crown, Loader2 } from "lucide-react";
 
 import { useToast } from "@/components/ui/Toast";
 
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabase";
+
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -25,30 +28,21 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
       });
 
-      const data = await res.json();
+      if (authError) throw authError;
 
-      if (res.ok) {
-        // Store user in localStorage
-        localStorage.setItem("user", JSON.stringify(data.user));
-
-        toast(`Welcome back, ${data.user.name}!`);
-
-        // Redirect to home on success
+      if (data.user) {
+        toast(`Welcome back!`);
         router.push("/");
-        window.location.href = "/"; // Force refresh to update header
-      } else {
-        const errorMsg = data.error || "Login failed";
-        setError(errorMsg);
-        toast(errorMsg, "error");
       }
-    } catch (err) {
-      setError("Something went wrong. Please try again.");
+    } catch (err: any) {
+      const errorMsg = err.message || "Login failed";
+      setError(errorMsg);
+      toast(errorMsg, "error");
     } finally {
       setLoading(false);
     }

@@ -7,22 +7,11 @@ import ProductCard from "@/components/ui/ProductCard";
 import { ArrowRight, ShoppingBag, Menu, Star, User, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
   const { cartCount } = useCart();
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
-  };
+  const { user, signOut } = useAuth();
 
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-primary/20">
@@ -39,8 +28,11 @@ export default function Home() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-            <Link href="#" className="hover:text-primary transition-colors">Collections</Link>
-            <Link href="#" className="hover:text-primary transition-colors">Best Sellers</Link>
+            <Link href="/" className="hover:text-primary transition-colors">Collections</Link>
+            <Link href="/" className="hover:text-primary transition-colors">Best Sellers</Link>
+            {user && (
+              <Link href="/orders" className="hover:text-primary transition-colors">My Orders</Link>
+            )}
             <Link href="#" className="hover:text-primary transition-colors">About Us</Link>
           </nav>
 
@@ -50,12 +42,12 @@ export default function Home() {
               <div className="flex items-center gap-4 animate-in fade-in duration-500">
                 <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-foreground">
                   <User className="w-4 h-4 text-primary" />
-                  <span>Hi, {user.name}</span>
+                  <span>Hi, {user.user_metadata?.full_name || user.email}</span>
                 </div>
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={handleLogout}
+                  onClick={() => signOut()}
                   className="text-muted-foreground hover:text-destructive transition-colors hidden sm:flex"
                 >
                   <LogOut className="w-4 h-4 mr-2" /> Logout

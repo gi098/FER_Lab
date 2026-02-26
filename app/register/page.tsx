@@ -9,6 +9,8 @@ import { Crown, ArrowRight, Loader2 } from "lucide-react";
 
 import { useToast } from "@/components/ui/Toast";
 
+import { supabase } from "@/lib/supabase";
+
 export default function RegisterPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -26,25 +28,26 @@ export default function RegisterPage() {
     setError("");
 
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+      const { data, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.fullName,
+          }
+        }
       });
 
-      const data = await res.json();
+      if (authError) throw authError;
 
-      if (res.ok) {
-        toast("Account created successfully!");
-        // Redirect to login on success
+      if (data.user) {
+        toast("Registration successful! Please check your email for verification.");
         router.push("/login");
-      } else {
-        const errorMsg = data.error || "Registration failed";
-        setError(errorMsg);
-        toast(errorMsg, "error");
       }
-    } catch (err) {
-      setError("Something went wrong. Please try again.");
+    } catch (err: any) {
+      const errorMsg = err.message || "Registration failed";
+      setError(errorMsg);
+      toast(errorMsg, "error");
     } finally {
       setLoading(false);
     }

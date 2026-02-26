@@ -5,14 +5,49 @@ import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2, ArrowRight, ShieldCheck, Truck } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/components/ui/Toast";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function CartPage() {
-    const { cart, removeFromCart, updateQuantity, cartTotal } = useCart();
+    const { cart, removeFromCart, updateQuantity, cartTotal, clearCart } = useCart();
     const { toast } = useToast();
+    const { user } = useAuth();
+    const router = useRouter();
+    const [isCheckingOut, setIsCheckingOut] = useState(false);
 
     const handleRemove = (id: number, name: string) => {
         removeFromCart(id);
         toast(`Removed ${name} from cart`, "error");
+    };
+
+    const handleCheckout = async () => {
+        if (!user) {
+            toast("Please login to proceed with checkout", "error");
+            router.push("/login?redirect=/cart");
+            return;
+        }
+
+        setIsCheckingOut(true);
+        try {
+            const { error } = await supabase.from('orders').insert({
+                user_id: user.id,
+                items: cart,
+                total_price: cartTotal,
+                status: 'pending'
+            });
+
+            if (error) throw error;
+
+            toast("Order placed successfully!", "success");
+            clearCart();
+            router.push("/orders");
+        } catch (err: any) {
+            toast(err.message || "Failed to place order", "error");
+        } finally {
+            setIsCheckingOut(false);
+        }
     };
 
     if (cart.length === 0) {
@@ -133,8 +168,12 @@ export default function CartPage() {
                                 </div>
                             </div>
 
-                            <Button className="w-full rounded-full h-12 text-base font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02]">
-                                Checkout Now
+                            <Button
+                                onClick={handleCheckout}
+                                disabled={isCheckingOut}
+                                className="w-full rounded-full h-12 text-base font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02]"
+                            >
+                                {isCheckingOut ? "Processing..." : "Checkout Now"}
                             </Button>
 
                             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
