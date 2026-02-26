@@ -34,12 +34,12 @@ export async function POST(request: Request) {
                 const fileData = fs.readFileSync(dbPath, "utf-8");
                 users = JSON.parse(fileData);
             }
-        } catch (err) {
+        } catch (_err) {
             // ignore
         }
 
         // Check if user exists
-        if (users.find((u: any) => u.email === email)) {
+        if (users.find((u: { email: string }) => u.email === email)) {
             return NextResponse.json(
                 { error: "User already exists" },
                 { status: 400 }
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
             { status: 201 }
         );
 
-    } catch (error) {
+    } catch (_error) {
         return NextResponse.json(
             { error: "Something went wrong" },
             { status: 500 }

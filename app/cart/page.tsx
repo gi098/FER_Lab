@@ -2,7 +2,7 @@
 
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, Trash2, ArrowRight, ShieldCheck, Truck } from "lucide-react";
+import { Minus, Plus, Trash2, ShieldCheck, Truck } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/context/AuthContext";
@@ -43,8 +43,8 @@ export default function CartPage() {
             toast("Order placed successfully!", "success");
             clearCart();
             router.push("/orders");
-        } catch (err: any) {
-            toast(err.message || "Failed to place order", "error");
+        } catch (err: unknown) {
+            toast(err instanceof Error ? err.message : "Failed to place order", "error");
         } finally {
             setIsCheckingOut(false);
         }

@@ -4,8 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { products } from "@/lib/data";
 import ProductCard from "@/components/ui/ProductCard";
-import { ArrowRight, ShoppingBag, Menu, Star, User, LogOut } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowRight, ShoppingBag, Menu, User, LogOut } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 

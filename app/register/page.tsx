@@ -44,8 +44,8 @@ export default function RegisterPage() {
         toast("Registration successful! Please check your email for verification.");
         router.push("/login");
       }
-    } catch (err: any) {
-      const errorMsg = err.message || "Registration failed";
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "Registration failed";
       setError(errorMsg);
       toast(errorMsg, "error");
     } finally {

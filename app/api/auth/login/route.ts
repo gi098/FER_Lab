@@ -26,11 +26,11 @@ export async function POST(request: Request) {
       try {
         const fileData = fs.readFileSync(dbPath, "utf-8");
         users = JSON.parse(fileData);
-      } catch (err) {
+      } catch (_err) {
         // file might not exist yet
       }
 
-      const user = users.find((u: any) => u.email === email && u.password === password);
+      const user = users.find((u: { email: string; password: string; name: string }) => u.email === email && u.password === password);
 
       if (user) {
         return NextResponse.json(
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       { error: "Invalid credentials" },
       { status: 401 }
     );
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Something went wrong" },
       { status: 500 }

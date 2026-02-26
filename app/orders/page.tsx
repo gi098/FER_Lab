@@ -3,14 +3,21 @@
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ShoppingBag, Calendar, Package, Clock } from 'lucide-react'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Calendar, Package, Clock } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
+interface OrderItem {
+    image: string;
+    name: string;
+    quantity: number;
+    price: number;
+}
+
 export default function OrdersPage() {
     const { user, loading: authLoading } = useAuth()
-    const [orders, setOrders] = useState<any[]>([])
+    const [orders, setOrders] = useState<{ id: string; created_at: string; total_price: number; status: string; items: OrderItem[] }[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -30,7 +37,7 @@ export default function OrdersPage() {
 
             if (error) throw error
             setOrders(data || [])
-        } catch (err) {
+        } catch (err: unknown) {
             console.error('Error fetching orders:', err)
         } finally {
             setLoading(false)
@@ -73,7 +80,7 @@ export default function OrdersPage() {
                 {orders.length === 0 ? (
                     <div className="text-center py-20 bg-card border border-border/40 rounded-3xl space-y-6">
                         <Package className="w-12 h-12 text-muted-foreground mx-auto" />
-                        <p className="text-muted-foreground">You haven't placed any orders yet.</p>
+                        <p className="text-muted-foreground">You haven&apos;t placed any orders yet.</p>
                         <Link href="/">
                             <Button>Explore Collection</Button>
                         </Link>
@@ -110,7 +117,7 @@ export default function OrdersPage() {
                                 </CardHeader>
                                 <CardContent className="p-8">
                                     <div className="space-y-6">
-                                        {order.items.map((item: any, idx: number) => (
+                                        {order.items.map((item: OrderItem, idx: number) => (
                                             <div key={idx} className="flex gap-4 items-center">
                                                 <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary/10 flex-shrink-0">
                                                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />

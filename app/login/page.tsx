@@ -9,7 +9,6 @@ import { Crown, Loader2 } from "lucide-react";
 
 import { useToast } from "@/components/ui/Toast";
 
-import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
@@ -39,8 +38,8 @@ export default function LoginPage() {
         toast(`Welcome back!`);
         router.push("/");
       }
-    } catch (err: any) {
-      const errorMsg = err.message || "Login failed";
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "Login failed";
       setError(errorMsg);
       toast(errorMsg, "error");
     } finally {
@@ -133,7 +132,7 @@ export default function LoginPage() {
 
         <div className="mt-8 text-center">
           <p className="text-sm text-white/50">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/register" className="font-medium text-white hover:text-white/80 transition-colors border-b border-transparent hover:border-white/50">
               Join Luxury Scent
             </Link>
