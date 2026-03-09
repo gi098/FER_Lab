@@ -26,6 +26,8 @@ import { ToastProvider } from "@/components/ui/Toast";
 import { CartProvider } from "@/context/CartContext";
 
 import { AuthProvider } from "@/context/AuthContext";
+import ChatInterface from "@/components/ChatInterface";
+import Navigation from "@/components/Navigation";
 
 export default function RootLayout({
   children,
@@ -33,14 +35,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased`}
+        suppressHydrationWarning
       >
         <AuthProvider>
           <ToastProvider>
             <CartProvider>
+              <Navigation />
               {children}
+              <ChatInterface />
             </CartProvider>
           </ToastProvider>
         </AuthProvider>

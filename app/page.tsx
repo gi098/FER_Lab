@@ -4,119 +4,92 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { products } from "@/lib/data";
 import ProductCard from "@/components/ui/ProductCard";
-import { ArrowRight, ShoppingBag, Menu, User, LogOut } from "lucide-react";
+import { ArrowRight, ShoppingBag, Menu, User, LogOut, Package } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const { cartCount } = useCart();
   const { user, signOut } = useAuth();
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const heroImages = [
+    "https://i.pinimg.com/1200x/cd/33/29/cd33292adc24a3a1efccc6023f8ad85c.jpg",
+    "https://i.pinimg.com/736x/0c/ae/dc/0caedc2d2d7ab311e7315988235327de.jpg",
+    "https://i.pinimg.com/1200x/ff/43/a7/ff43a7a5d8b58450458290f9fc587dfe.jpg",
+    "https://i.pinimg.com/1200x/50/ae/fa/50aefaf0a9a94bb16a965f6e6528aca3.jpg",
+    "https://i.pinimg.com/1200x/77/7e/b2/777eb250c7aaff92c6534c887e929eef.jpg"
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, 4000); // Change image every 4 seconds
+    return () => clearInterval(timer);
+  }, [heroImages.length]);
 
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-primary/20">
 
-      {/* === HEADER === */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
-        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-serif font-bold tracking-tighter text-foreground">
-              LUXURY SCENT
-            </h1>
-          </div>
-
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-            <Link href="/" className="hover:text-primary transition-colors">Collections</Link>
-            <Link href="/" className="hover:text-primary transition-colors">Best Sellers</Link>
-            {user && (
-              <Link href="/orders" className="hover:text-primary transition-colors">My Orders</Link>
-            )}
-            <Link href="#" className="hover:text-primary transition-colors">About Us</Link>
-          </nav>
-
-          {/* Actions */}
-          <div className="flex items-center gap-4">
-            {user ? (
-              <div className="flex items-center gap-4 animate-in fade-in duration-500">
-                <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-foreground">
-                  <User className="w-4 h-4 text-primary" />
-                  <span>Hi, {user.user_metadata?.full_name || user.email}</span>
-                </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => signOut()}
-                  className="text-muted-foreground hover:text-destructive transition-colors hidden sm:flex"
-                >
-                  <LogOut className="w-4 h-4 mr-2" /> Logout
-                </Button>
-              </div>
-            ) : (
-              <>
-                <Link href="/login" className="text-sm font-medium hover:text-primary hidden sm:block">
-                  Log In
-                </Link>
-                <Link href="/register">
-                  <Button size="sm" className="rounded-full px-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md transition-all hover:scale-105 active:scale-95 border-none font-bold">
-                    Register
-                  </Button>
-                </Link>
-              </>
-            )}
-
-            <Link href="/cart" className="relative">
-              <Button size="icon" variant="ghost" className="rounded-full">
-                <ShoppingBag className="w-5 h-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground animate-in zoom-in duration-300">
-                    {cartCount}
-                  </span>
-                )}
-              </Button>
-            </Link>
-            <Button size="icon" variant="ghost" className="md:hidden rounded-full">
-              <Menu className="w-5 h-5" />
-            </Button>
-          </div>
-        </div>
-      </header>
+      {/* Header moved to global layout component */}
 
       {/* === HERO SECTION === */}
-      <section className="relative h-screen min-h-[600px] flex flex-col items-center justify-end pb-12 overflow-hidden">
-        {/* Video Background */}
-        <div className="absolute inset-0 z-0">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          >
-            <source src="https://v1.pinimg.com/videos/mc/720p/d9/da/c2/d9dac29588ff3a1e50986995d9ee1153.mp4" type="video/mp4" />
-          </video>
-          {/* Subtle Overlay - Reduced to barely visible to maximize video clarity */}
-          <div className="absolute inset-0 bg-black/10"></div>
-          {/* Gradient for text legibility at the very bottom */}
-          <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-black/60 to-transparent"></div>
+      <section className="relative h-screen min-h-[600px] flex flex-col items-center justify-center pb-12 overflow-hidden bg-background">
+        {/* Carousel Background */}
+        <div className="absolute inset-0 z-0 bg-stone-100 flex items-center justify-center overflow-hidden">
+          {heroImages.map((src, index) => (
+            <div
+              key={src}
+              className={`absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out transform flex items-center justify-center p-4 sm:p-12 ${index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-105"
+                }`}
+            >
+              <img
+                src={src}
+                alt={`Hero ${index + 1}`}
+                className="w-full h-full object-contain filter drop-shadow-2xl"
+              />
+            </div>
+          ))}
         </div>
+        {/* Elegant Gradient Overlay - Top & Bottom only so middle (product) is clear */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background/80 pointer-events-none"></div>
 
         {/* Minimalist Content */}
-        <div className="relative z-10 w-full container mx-auto px-6 flex flex-col items-center gap-6 animate-in fade-in duration-1000 slide-in-from-bottom-8">
+        <div className="relative z-10 w-full container mx-auto px-6 flex flex-col items-center gap-8 mt-auto animate-in fade-in duration-1000 slide-in-from-bottom-8">
 
-          {/* Shop Button - Minimal Ultra-Glass */}
+          <div className="flex flex-col items-center text-center space-y-4 max-w-2xl bg-background/30 backdrop-blur-md p-8 rounded-2xl border border-white/20 shadow-xl">
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground drop-shadow-sm tracking-tight">
+              Timeless Elegance
+            </h2>
+            <p className="text-muted-foreground font-medium md:text-lg">
+              Discover the perfect piece that speaks to your unique style.
+            </p>
+          </div>
+
+          {/* Shop Button - Solid & Professional */}
           <Button
             size="lg"
-            className="rounded-full px-12 h-14 bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-sm transition-all duration-500 font-serif tracking-widest uppercase hover:scale-105"
+            className="rounded-full px-12 h-14 bg-foreground hover:bg-foreground/90 text-background font-medium tracking-widest uppercase transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
           >
-            Shop Collection
+            Explore Collection
           </Button>
 
-          {/* Scroll Indicator */}
-          <div className="flex flex-col items-center gap-2 mt-4 opacity-60 animate-bounce cursor-pointer hover:opacity-100 transition-opacity">
-            <span className="text-[10px] text-white/80 uppercase tracking-widest">Explore</span>
-            <div className="w-[1px] h-8 bg-gradient-to-b from-white to-transparent"></div>
+          {/* Carousel Controls */}
+          <div className="flex items-center gap-3 mt-8">
+            {heroImages.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentSlide(idx)}
+                className={`transition-all duration-500 rounded-full ${idx === currentSlide
+                  ? "w-8 h-2 bg-foreground"
+                  : "w-2 h-2 bg-foreground/30 hover:bg-foreground/50"
+                  }`}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
           </div>
+
         </div>
       </section>
 
@@ -194,6 +167,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </div>
+    </div >
   );
 }
