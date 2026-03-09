@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, MessageCircle, X, Gem } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { useAuth } from "@/context/AuthContext";
 
 type Message = {
     id: string;
@@ -18,10 +19,10 @@ type Message = {
 };
 
 export default function ChatInterface() {
+    const { user } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
-    const [userId, setUserId] = useState<string | null>(null);
     const [isTyping, setIsTyping] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     const [isMounted, setIsMounted] = useState(false);
@@ -31,15 +32,12 @@ export default function ChatInterface() {
     }, []);
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
-                setUserId(session.user.id);
-                fetchMessages(session.user.id);
-            }
-        };
-        fetchUser();
-    }, []);
+        if (user?.id) {
+            fetchMessages(user.id);
+        } else {
+            setMessages([]);
+        }
+    }, [user?.id]);
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -51,7 +49,7 @@ export default function ChatInterface() {
     }, [messages, isTyping, isOpen]);
 
     useEffect(() => {
-        if (!userId) return;
+        if (!user?.id) return;
 
         const channel = supabase
             .channel("realtime-messages")
@@ -61,7 +59,7 @@ export default function ChatInterface() {
                     event: "INSERT",
                     schema: "public",
                     table: "messages",
-                    filter: `user_id=eq.${userId}`,
+                    filter: `user_id=eq.${user.id}`,
                 },
                 (payload) => {
                     const newMessage = payload.new as Message;
@@ -79,7 +77,7 @@ export default function ChatInterface() {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [userId]);
+    }, [user?.id]);
 
     const fetchMessages = async (uid: string) => {
         const { data, error } = await supabase
@@ -117,7 +115,7 @@ export default function ChatInterface() {
 
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!input.trim() || !userId) return;
+        if (!input.trim() || !user?.id) return;
 
         const userMessage = input.trim();
         setInput("");
@@ -125,7 +123,7 @@ export default function ChatInterface() {
         // optimistic UI update for better UX
         const optimisticMsg: Message = {
             id: Date.now().toString(),
-            user_id: userId,
+            user_id: user.id,
             content: userMessage,
             sender_type: "user",
             created_at: new Date().toISOString()
@@ -135,7 +133,7 @@ export default function ChatInterface() {
         setIsTyping(true);
 
         const { error } = await supabase.from("messages").insert({
-            user_id: userId,
+            user_id: user.id,
             content: userMessage,
             sender_type: "user",
         });
@@ -145,7 +143,7 @@ export default function ChatInterface() {
                 const res = await fetch("/api/chat", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ userId, message: userMessage }),
+                    body: JSON.stringify({ userId: user.id, message: userMessage }),
                 });
                 const data = await res.json();
 
@@ -156,7 +154,7 @@ export default function ChatInterface() {
                         if (prev.find(m => m.content === data.reply)) return prev;
                         return [...prev, {
                             id: Date.now().toString() + "-ai",
-                            user_id: userId,
+                            user_id: user.id,
                             content: data.reply,
                             sender_type: "ai",
                             created_at: new Date().toISOString()
@@ -175,7 +173,7 @@ export default function ChatInterface() {
         }
     };
 
-    if (!isMounted || !userId) return null;
+    if (!isMounted || !user?.id) return null;
 
     return (
         <div className="fixed bottom-6 right-6 z-50">
